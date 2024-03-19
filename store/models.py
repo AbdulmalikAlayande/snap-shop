@@ -74,8 +74,8 @@ class Customer(models.Model):
         (Membership_Type.SILVER_MEMBERSHIP, 'Silver'),
         (Membership_Type.GOLD_MEMBERSHIP, 'Gold')
     ]
-    first_name = models.TextField(max_length=255, null=False)
-    last_name = models.TextField(max_length=255, null=False)
+    first_name = models.TextField(max_length=1000, null=False)
+    last_name = models.TextField(max_length=1000, null=False)
     email = models.EmailField(error_messages="Invalid Email", unique=True)
     phone_number = models.TextField(max_length=11, null=False)
     profile_image = models.FileField()
