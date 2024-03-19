@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hello World</title>
+    <style>
+        body{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        {% for each_name in name %}
+            {% if name %}
+                <p>Hello {{ each_name }}</p>
+            {% else %}
+                <p>Hello World</p>
+            {% endif %}
+        {% endfor %}
+
+    </div>
+</body>
+</html>
