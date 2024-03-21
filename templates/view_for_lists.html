@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hello World</title>
+    <style>
+        body{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <ul>
+            {% for data in products %}
+                {% if data %}
+                    <li>
+                        <p>{{ data.title }}</p>
+                        <p>{{ data.description }}</p>
+                        <p>{{ data.price }}</p>
+                        <p>{{ data.inventory }}</p>
+                        <p>{{ data.last_updated }}</p>
+                        <p>{{ data.collection }}</p>
+                        <p>{{ data.promotions }}</p>
+                    </li>
+                {% else %}
+                    <p>No data</p>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+</html>

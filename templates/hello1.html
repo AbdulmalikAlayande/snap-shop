@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+     <meta charset="UTF-8">
     <title>Hello World</title>
     <style>
         body{
@@ -13,9 +13,9 @@
 </head>
 <body>
     <div>
-        {% for each_name in name %}
-            {% if name %}
-                <p>Hello {{ each_name }}</p>
+        {% for data in products %}
+            {% if data %}
+                <p>Hello {{ data }}</p>
             {% else %}
                 <p>Hello World</p>
             {% endif %}
