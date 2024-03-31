@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-hu$l7pflppk7viw&d@reu^8-5r-=31z2enx7v&=m+nr346k=%r
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -34,13 +34,13 @@ INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
-    # 'django.contrib.sessions',
+    'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
     'debug_toolbar',
-    'store',
-    'tags',
+    'store.apps.StoreConfig',
+    'tags.apps.TagsConfig',
 
 ]
 
@@ -92,7 +92,7 @@ DATABASES = {
         'NAME': 'storefront_db',
         'HOST': 'localhost',
         'USER': 'root',
-        'PASSWORD': 'Code$247'
+        'PASSWORD': 'ayanniyi20'
     }
 }
 

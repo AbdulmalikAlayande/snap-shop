@@ -99,11 +99,10 @@ class Order(models.Model):
 
     def __repr__(self):
         return f"""
-            {
-        'placed_at': {self.placed_at},
+                placed_at: {self.placed_at},
                 payment_status: {self.payment_status}
-            }
-        """
+                customer_id: {self.customer.id}
+                """
 
 class Order_Item(models.Model):
     order = models.ForeignKey(to=Order, on_delete=PROTECT)

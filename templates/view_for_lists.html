@@ -17,13 +17,20 @@
             {% for data in products %}
                 {% if data %}
                     <li>
-                        <p>{{ data.title }}</p>
-                        <p>{{ data.description }}</p>
-                        <p>{{ data.price }}</p>
-                        <p>{{ data.inventory }}</p>
-                        <p>{{ data.last_updated }}</p>
-                        <p>{{ data.collection }}</p>
-                        <p>{{ data.promotions }}</p>
+                        <p>First Name: {{ data.first_name }}</p>
+                        <p>Last Name: {{ data.last_name }}</p>
+                        <p>Email: {{ data.email }}</p>
+                        <p>Phone Number: {{ data.phone_number }}</p>
+                        <p>Membership: {{ data.membership }}</p>
+                        <p>Birth Date: {{ data.birth_date }}</p>
+                        <p>Profile Image Url: {{ data.profile_image_url }}</p>
+{#                        <p>{{ data.title }}</p>#}
+{#                        <p>{{ data.description }}</p>#}
+{#                        <p>{{ data.price }}</p>#}
+{#                        <p>{{ data.inventory }}</p>#}
+{#                        <p>{{ data.last_updated }}</p>#}
+{#                        <p>{{ data.collection }}</p>#}
+{#                        <p>{{ data.promotions }}</p>#}
                     </li>
                 {% else %}
                     <p>No data</p>
