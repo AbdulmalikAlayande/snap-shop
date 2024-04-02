@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+     <meta charset="UTF-8">
+    <title>Hello World</title>
+    <style>
+        body{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .Main-Class{
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="Main-Class">
+        <ul>
+            <h1>LIST 1</h1>
+            {% for data in values %}
+                {% if data %}
+                    <li>
+                        <h3>Title: {{ data.title }}</h3>
+                        <p>Description: {{ data.description }}</p>
+                        <p>Id: {{ data.id }}</p>
+                    </li>
+                {% else %}
+                    <p>Hello World</p>
+                {% endif %}
+            {% endfor %}
+        </ul>
+        <ul>
+            <h1>LIST 2</h1>
+            {% for data in values_list %}
+                {% if data %}
+                    <li>
+                        {{ data }}
+{#                        <h3>Title: {{ data.title }}</h3>#}
+{#                        <p>Description: {{ data.description }}</p>#}
+{#                        <p>Id: {{ data.id }}</p>#}
+                    </li>
+                {% else %}
+                    <p>Hello World</p>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+</html>

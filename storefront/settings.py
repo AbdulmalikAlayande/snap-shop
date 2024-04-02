@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-hu$l7pflppk7viw&d@reu^8-5r-=31z2enx7v&=m+nr346k=%r
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -34,13 +34,13 @@ INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
-    # 'django.contrib.sessions',
+    'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
     'debug_toolbar',
-    'playground',
-    'store',
-    'tags',
+    'store.apps.StoreConfig',
+    'tags.apps.TagsConfig',
 
 ]
 
@@ -88,8 +88,11 @@ WSGI_APPLICATION = 'storefront.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'storefront_db',
+        'HOST': 'localhost',
+        'USER': 'root',
+        'PASSWORD': 'ayanniyi20'
     }
 }
 

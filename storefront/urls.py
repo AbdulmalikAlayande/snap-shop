@@ -18,8 +18,12 @@ from django.contrib import admin
 from django.urls import path, include
 import debug_toolbar
 
+from tags.views import HomePageView
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("__debug__/", include(debug_toolbar.urls)),
-    path('playground/', include('playground.urls'))
+    path('store/', include('store.urls')),
+    path('', HomePageView.as_view(), name='home_page'),
+    path('tags/', include('tags.urls'))
 ]
