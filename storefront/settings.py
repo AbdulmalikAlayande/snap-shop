@@ -27,7 +27,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-
+# settings.py
+APPEND_SLASH = False
 # Application definition
 
 INSTALLED_APPS = [
@@ -37,8 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework',
-    'debug_toolbar',
+    'rest_framework.apps.RestFrameworkConfig',
     'store.apps.StoreConfig',
     'tags.apps.TagsConfig',
     'address.apps.AddressConfig',
@@ -46,7 +46,7 @@ INSTALLED_APPS = [
 ]
 # python -m pip install -r requirements.txt
 MIDDLEWARE = [
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
+    # 'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',

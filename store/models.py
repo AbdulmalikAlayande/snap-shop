@@ -44,9 +44,9 @@ class Customer(models.Model):
     email = models.EmailField(error_messages="Invalid Email", unique=True)
     password = models.TextField(max_length=15, null=False)
     phone_number = models.TextField(max_length=11, null=False)
-    profile_image = models.FileField()
+    profile_image = models.FileField(null=True)
     birth_date = models.DateField(null=True)
-    profile_image_url = models.URLField()
+    profile_image_url = models.URLField(null=True)
     address = AddressField(related_name='+', blank=True, null=True)
 
     def __repr__(self):
