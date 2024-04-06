@@ -46,10 +46,10 @@ class CustomerSerializer(serializers.Serializer):
     last_name = serializers.CharField(max_length=30)
     email = serializers.EmailField(max_length=30)
     password = serializers.CharField(max_length=30)
-    phone_number = serializers.CharField(max_length=11, null=False)
-    profile_image = serializers.FileField()
-    birth_date = serializers.DateField()
-    profile_image_url = serializers.URLField()
+    phone_number = serializers.CharField(max_length=11)
+    profile_image = serializers.FileField(required=False)
+    birth_date = serializers.DateField(required=False)
+    profile_image_url = serializers.URLField(required=False)
 
     class Meta:
         model = Customer
