@@ -6,9 +6,9 @@ from store.models import *
 # Register your models here.
 @admin.register(Customer)
 class CustomerAdmin(admin.ModelAdmin):
-    list_display = ['first_name', 'last_name', 'email', 'password', 'phone_number', 'profile_image']
+    list_display = ['first_name', 'last_name', 'email', 'password', 'phone_number']
     list_filter = ['first_name', 'last_name', 'email',]
-    fields = ['first_name', 'last_name', 'email', 'phone_number', 'profile_image', 'password', 'birth_date', 'profile_image_url']
+    fields = ['first_name', 'last_name', 'email', 'phone_number', 'password', 'birth_date']
     search_fields = ['first_name', 'last_name', 'email']
     ordering = ['first_name', 'last_name', 'email']
 

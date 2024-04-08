@@ -7,6 +7,7 @@ from requests import Response
 from rest_framework import status, generics
 import requests
 
+from store.models import Cart
 from store.serializers import CustomerSerializer
 
 
@@ -19,7 +20,9 @@ class CustomerRegistrationView(generics.CreateAPIView):
             customer_serializer = self.get_serializer(data=data)
             if customer_serializer.is_valid():
                 validate_password(customer_serializer.validated_data.get('password'))
-                customer_serializer.save()
+                saved_customer = customer_serializer.save()
+                cart = Cart(customer=saved_customer)
+                cart.save()
                 self.send_notification_successful_mail(customer_serializer.validated_data.get('email'))
                 response = {
                     "message": "Sign Up Successful",

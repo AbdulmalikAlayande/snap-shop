@@ -49,13 +49,11 @@ class CustomerSerializer(serializers.ModelSerializer):
     password = serializers.CharField(max_length=30, write_only=True)
     username = serializers.CharField(max_length=150)
     phone_number = serializers.CharField(max_length=11)
-    profile_image = serializers.FileField(required=False)
-    birth_date = serializers.DateField(required=False)
-    profile_image_url = serializers.URLField(required=False)
+    birth_date = serializers.DateField(required=False, format='%d-%m-%Y')
 
     class Meta:
         model = Customer
-        fields = ['id', 'first_name', 'last_name', 'email', 'password', 'phone_number', 'username', 'profile_image', 'birth_date', 'profile_image_url']
+        fields = ['id', 'first_name', 'last_name', 'email', 'password', 'phone_number', 'username', 'birth_date']
         extra_kwargs = {
             'password': {'write_only': True},
             'profile_image': {'write_only': True},

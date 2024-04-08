@@ -43,9 +43,7 @@ class Product(models.Model):
 
 class Customer(AbstractUser):
     phone_number = models.TextField(max_length=11, null=False)
-    profile_image = models.FileField(null=True)
     birth_date = models.DateField(null=True)
-    profile_image_url = models.URLField(null=True)
     address = AddressField(related_name='+', blank=True, null=True)
 
     def toJson(self):
@@ -59,7 +57,6 @@ class Customer(AbstractUser):
                     password: {self.password}
                     phone_number: {self.phone_number}
                     birth_date: {self.birth_date}
-                    profile_image_url: {self.profile_image_url}
                     address: {self.address}
                 """
 

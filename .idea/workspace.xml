@@ -6,6 +6,9 @@
   <component name="ChangeListManager">
     <list default="true" id="9f6605ad-b3c2-4278-806c-80914c73980d" name="Changes" comment="Still learning about models">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/store/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/store/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/store/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/store/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/store/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/store/serializers.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/store/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/store/views.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -103,7 +106,7 @@
       <command value="python manage.py test" />
     </option>
   </component>
-  <component name="RunManager" selected="HTTP Request.api | #1">
+  <component name="RunManager" selected="Django tests.Test: tags.tests.TagsTests">
     <configuration name="Test: tags.tests.TagsTests" type="DjangoTestsConfigurationType" temporary="true">
       <module name="snapshop" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -406,7 +409,7 @@
       <workItem from="1712091557809" duration="44000" />
       <workItem from="1712097809280" duration="37936000" />
       <workItem from="1712422508941" duration="2753000" />
-      <workItem from="1712498706636" duration="22807000" />
+      <workItem from="1712498706636" duration="25526000" />
     </task>
     <task id="LOCAL-00001" summary="initial commit">
       <option name="closed" value="true" />
