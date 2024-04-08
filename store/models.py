@@ -1,5 +1,8 @@
 import enum
+import json
+
 from address.models import AddressField
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models import PROTECT, CASCADE
 
@@ -38,25 +41,26 @@ class Product(models.Model):
                 """
 
 
-class Customer(models.Model):
-    first_name = models.CharField(max_length=255, null=False)
-    last_name = models.CharField(max_length=255, null=False)
-    email = models.EmailField(error_messages="Invalid Email", unique=True)
-    password = models.TextField(max_length=15, null=False)
+class Customer(AbstractUser):
     phone_number = models.TextField(max_length=11, null=False)
     profile_image = models.FileField(null=True)
     birth_date = models.DateField(null=True)
     profile_image_url = models.URLField(null=True)
     address = AddressField(related_name='+', blank=True, null=True)
 
+    def toJson(self):
+        return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
+
     def __repr__(self):
         return  f"""
-                    first_name: {self.first_name},
-                    last_name: {self.last_name},
-                    email: {self.email},
-                    phone_number: {self.phone_number},
+                    first_name: {self.first_name}
+                    last_name: {self.last_name}
+                    email: {self.email}
+                    password: {self.password}
+                    phone_number: {self.phone_number}
                     birth_date: {self.birth_date}
                     profile_image_url: {self.profile_image_url}
+                    address: {self.address}
                 """
 
     class Meta:

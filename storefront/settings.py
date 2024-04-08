@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     'store.apps.StoreConfig',
     'tags.apps.TagsConfig',
     'address.apps.AddressConfig',
-    'payment.apps.PaymentConfig'
+    'notification.apps.NotificationConfig',
+    'payment.apps.PaymentConfig',
 ]
 # python -m pip install -r requirements.txt
 MIDDLEWARE = [
@@ -115,6 +116,13 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTH_USER_MODEL = 'store.Customer'
+PASSWORD_HASHERS = [
+    "django.contrib.auth.hashers.Argon2PasswordHasher",
+    "django.contrib.auth.hashers.PBKDF2PasswordHasher",
+    "django.contrib.auth.hashers.BCryptSHA256PasswordHasher",
+    "django.contrib.auth.hashers.ScryptPasswordHasher",
+]
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/

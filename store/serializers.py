@@ -30,25 +30,24 @@ class LocalitySerializer(serializers.ModelSerializer):
         model = Locality
         fields = ['street_number', 'route', 'locality']
 
-class AddressSerializer(serializers.ModelSerializer):
+# class AddressSerializer(serializers.ModelSerializer):
+#
+#     class Meta:
+#         model = Address
+#         fields = ['street_number', 'route', 'locality']
+#
+    # def  create(self, validated_data):
+    #     print('hello')
+    #     if validated_data:
+    #         created_address = Address.objects.create(**validated_data)
+    #         return created_address
 
-
-    class Meta:
-        model = Address
-        fields = ['street_number', 'route', 'locality']
-
-    def  create(self, validated_data):
-        print('hello')
-        if validated_data:
-            created_address = Address.objects.create(**validated_data)
-            return created_address
-
-class CustomerSerializer(serializers.Serializer):
-    address = AddressSerializer(required=True)
+class CustomerSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(max_length=30)
     last_name = serializers.CharField(max_length=30)
     email = serializers.EmailField(max_length=30)
-    password = serializers.CharField(max_length=30)
+    password = serializers.CharField(max_length=30, write_only=True)
+    username = serializers.CharField(max_length=150)
     phone_number = serializers.CharField(max_length=11)
     profile_image = serializers.FileField(required=False)
     birth_date = serializers.DateField(required=False)
@@ -56,19 +55,12 @@ class CustomerSerializer(serializers.Serializer):
 
     class Meta:
         model = Customer
-        fields = ['id', 'first_name', 'last_name', 'email', 'password', 'phone_number', 'profile_image', 'birth_date', 'profile_image_url', 'address']
+        fields = ['id', 'first_name', 'last_name', 'email', 'password', 'phone_number', 'username', 'profile_image', 'birth_date', 'profile_image_url']
         extra_kwargs = {
             'password': {'write_only': True},
             'profile_image': {'write_only': True},
         }
 
-    def create(self, validated_data):
-        address_data = validated_data.pop('address', None)
-        customer = Customer.objects.create(**validated_data)
-        print('HI')
-        if address_data:
-            Address.objects.create(**address_data)
-        return customer
 class ProductSerializer(serializers.Serializer):
     pass
 
