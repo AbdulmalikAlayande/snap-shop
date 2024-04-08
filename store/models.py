@@ -40,6 +40,8 @@ class Product(models.Model):
                     last_updated: {self.last_updated}
                 """
 
+    class Meta:
+        db_table = 'products'
 
 class Customer(AbstractUser):
     phone_number = models.TextField(max_length=11, null=False)
@@ -101,13 +103,22 @@ class Cart(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     customer = models.OneToOneField(to=Customer, on_delete=CASCADE)
 
+    class Meta:
+        db_table = 'carts'
+
 class CartItem(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, null=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveSmallIntegerField()
+
+    class Meta:
+        db_table = 'cart items'
 
 class Rating(models.Model):
     product = models.ForeignKey(to=Product, on_delete=CASCADE)
     customer = models.ForeignKey(to=Customer, on_delete=CASCADE)
     reviewText = models.TextField(max_length=1000)
     datetime = models.DateTimeField()
+
+    class Meta:
+        db_table = 'ratings'
