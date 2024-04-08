@@ -50,8 +50,5 @@ class CustomerRegistrationView(generics.CreateAPIView):
             'content-type': 'application/json',
             'accept': 'application/json'
         }
-        print('Hi')
         response: Response = requests.post(url=url, headers=headers, data=json.dumps(payload))
-        print(response.status_code)
-        print(response.json())
         return response

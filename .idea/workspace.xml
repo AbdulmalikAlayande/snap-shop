@@ -5,8 +5,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9f6605ad-b3c2-4278-806c-80914c73980d" name="Changes" comment="Still learning about models">
-      <change beforePath="$PROJECT_DIR$/.idea/djangoProject.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/store/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/store/views.py" afterDir="false" />
     </list>
@@ -408,7 +406,7 @@
       <workItem from="1712091557809" duration="44000" />
       <workItem from="1712097809280" duration="37936000" />
       <workItem from="1712422508941" duration="2753000" />
-      <workItem from="1712498706636" duration="22220000" />
+      <workItem from="1712498706636" duration="22807000" />
     </task>
     <task id="LOCAL-00001" summary="initial commit">
       <option name="closed" value="true" />
