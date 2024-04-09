@@ -28,7 +28,6 @@ class CustomerRegistrationView(generics.CreateAPIView):
             if customer_serializer.is_valid():
                 validate_password(customer_serializer.validated_data.get('password'))
                 saved_customer = customer_serializer.save()
-                print(saved_customer)
                 cart = Cart(customer=saved_customer)
                 cart.save()
                 self.send_notification_successful_mail([customer_serializer.validated_data.get('email')],
@@ -64,20 +63,3 @@ class CustomerRegistrationView(generics.CreateAPIView):
                 return html_content
         except Exception as exception:
             print(exception)
-
-
-
-# payload = {
-#             "from":"alaabdulmalik03@gmail.com",
-#             "to": email,
-#             "subject": "Registration Successful Mail",
-#             "text":"Your Registration Was Successful",
-#         }
-#         url = 'https://api.brevo.com/v1/email/send'
-#         headers = {
-#             'api-key': os.environ.get('BREVO_API_KEY'),
-#             'content-type': 'application/json',
-#             'accept': 'application/json'
-#         }
-#         response: Response = requests.post(url=url, headers=headers, data=json.dumps(payload))
-#         return response
