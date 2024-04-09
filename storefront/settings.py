@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'address.apps.AddressConfig',
     'notification.apps.NotificationConfig',
     'payment.apps.PaymentConfig',
+    'anymail.apps.AnymailBaseConfig'
 ]
 # python -m pip install -r requirements.txt
 MIDDLEWARE = [
@@ -83,7 +84,10 @@ INTERNAL_IPS = [
 WSGI_APPLICATION = 'storefront.wsgi.application'
 
 GOOGLE_API_KEY = os.environ.get('GOOGLE_MAP_API_KEY')
-
+ANYMAIL = {
+    'BREVO_API_KEY': os.environ.get('BREVO_API_KEY'),
+    "IGNORE_UNSUPPORTED_FEATURES": True,
+}
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
@@ -115,7 +119,7 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
+EMAIL_BACKEND = "anymail.backends.brevo.EmailBackend"
 AUTH_USER_MODEL = 'store.Customer'
 PASSWORD_HASHERS = [
     "django.contrib.auth.hashers.Argon2PasswordHasher",

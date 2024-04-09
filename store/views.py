@@ -1,5 +1,13 @@
+from __future__ import print_function
+
 import json
 import os
+
+import time
+import sib_api_v3_sdk
+from sib_api_v3_sdk.rest import ApiException
+from pprint import pprint
+
 
 from django.contrib.auth.password_validation import validate_password
 from django.http import JsonResponse
@@ -33,6 +41,7 @@ class CustomerRegistrationView(generics.CreateAPIView):
         except Exception as exception:
             print(exception)
             return JsonResponse(f'Registration Unsuccessful, {exception}', status=status.HTTP_400_BAD_REQUEST, safe=False)
+
 
     def send_notification_successful_mail(self, email: str) -> object:
         """
