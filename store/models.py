@@ -32,13 +32,11 @@ class Product(models.Model):
 
     def __repr__(self):
         return  f"""
-                    title: {self.title},
-                    description: {self.description},
-                    price: {self.unit_price},
-                    inventory: {self.quantity},
-                    category: {self.category},
-                    last_updated: {self.last_updated}
+                    {self.title} ({self.description})
                 """
+
+    def __str__(self):
+        return self.__repr__()
 
     class Meta:
         db_table = 'products'
@@ -51,7 +49,7 @@ class Customer(AbstractUser):
     def toJson(self):
         return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
 
-    def __repr__(self):
+    def __str__(self):
         return  f"""
                     first_name: {self.first_name}
                     last_name: {self.last_name}
@@ -84,7 +82,7 @@ class Order(models.Model):
     total_price = models.DecimalField(decimal_places=2, max_digits=10)
     payment = models.OneToOneField(to=Payment, on_delete=CASCADE)
 
-    def __repr__(self):
+    def __str__(self):
         return f"""
                 placed_at: {self.placed_at},
                 order_status: {self.order_status}

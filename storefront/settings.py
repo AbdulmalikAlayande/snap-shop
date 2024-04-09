@@ -91,7 +91,7 @@ GOOGLE_API_KEY = os.environ.get('GOOGLE_MAP_API_KEY')
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'storefront_db',
+        'NAME': 'snapshop_db',
         'HOST': 'localhost',
         'USER': 'root',
         'PASSWORD': 'ayanniyi20'
@@ -123,10 +123,12 @@ ANYMAIL = {
 EMAIL_BACKEND = "anymail.backends.brevo.EmailBackend"
 DEFAULT_FROM_EMAIL = "alaabdulmalik03@gmail.com"
 AUTH_USER_MODEL = 'store.Customer'
+
 PASSWORD_HASHERS = [
-    "django.contrib.auth.hashers.Argon2PasswordHasher",
+    "django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher",
     "django.contrib.auth.hashers.PBKDF2PasswordHasher",
     "django.contrib.auth.hashers.BCryptSHA256PasswordHasher",
+    "django.contrib.auth.hashers.Argon2PasswordHasher",
     "django.contrib.auth.hashers.ScryptPasswordHasher",
 ]
 
@@ -146,7 +148,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = 'static/'
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+# STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
