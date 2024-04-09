@@ -1,27 +1,26 @@
 from __future__ import print_function
 
 import json
-import os
-
-import time
-import sib_api_v3_sdk
-from sib_api_v3_sdk.rest import ApiException
-from pprint import pprint
-
 
 from django.contrib.auth.password_validation import validate_password
+from django.core.mail import EmailMultiAlternatives
 from django.http import JsonResponse
-from requests import Response
+from django.template import Context
+from django.template import Template
+from django.template.loader import get_template
 from rest_framework import status, generics
-import requests
 
 from store.models import Cart
 from store.serializers import CustomerSerializer
 
 
 class CustomerRegistrationView(generics.CreateAPIView):
-
+    EMAIL_SUBJECT = 'Registration Successful'
     serializer_class = CustomerSerializer
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.template_name = 'registration-successful-mail.html'
+
     def post(self, request, *args, **kwargs):
         try:
             data = json.loads(request.body)
@@ -29,9 +28,12 @@ class CustomerRegistrationView(generics.CreateAPIView):
             if customer_serializer.is_valid():
                 validate_password(customer_serializer.validated_data.get('password'))
                 saved_customer = customer_serializer.save()
+                print(saved_customer)
                 cart = Cart(customer=saved_customer)
                 cart.save()
-                self.send_notification_successful_mail(customer_serializer.validated_data.get('email'))
+                self.send_notification_successful_mail([customer_serializer.validated_data.get('email')],
+                                                       name=saved_customer.first_name,
+                                                       subject=self.EMAIL_SUBJECT)
                 response = {
                     "message": "Sign Up Successful",
                     "data": customer_serializer.data
@@ -42,25 +44,40 @@ class CustomerRegistrationView(generics.CreateAPIView):
             print(exception)
             return JsonResponse(f'Registration Unsuccessful, {exception}', status=status.HTTP_400_BAD_REQUEST, safe=False)
 
+    def send_notification_successful_mail(self, to: list, name: str, subject: str):
+        msg: EmailMultiAlternatives = EmailMultiAlternatives(subject=subject, to=to)
+        msg.attach_alternative(content=self.template_loader(var_dict={'name': name}), mimetype='text/html')
+        msg.send()
+        print('Message Sent Successfully')
 
-    def send_notification_successful_mail(self, email: str) -> object:
-        """
 
-        :param email:
-        :return: the response from the request object
-        """
-        print('Hello')
-        payload = {
-            "from":"alaabdulmalik03@gmail.com",
-            "to": email,
-            "subject": "Registration Successful Mail",
-            "text":"Your Registration Was Successful",
-        }
-        url = 'https://api.brevo.com/v1/email/send'
-        headers = {
-            'api-key': os.environ.get('BREVO_API_KEY'),
-            'content-type': 'application/json',
-            'accept': 'application/json'
-        }
-        response: Response = requests.post(url=url, headers=headers, data=json.dumps(payload))
-        return response
+    def template_loader(self, template=None, var_dict: dict = None):
+        try:
+            context = var_dict
+            if not template or template is None:
+                template: Template = get_template(self.template_name)
+                html_content = template.render(context=context)
+                return html_content
+            else:
+                template: Template = get_template(template)
+                html_content = template.render(context=context)
+                return html_content
+        except Exception as exception:
+            print(exception)
+
+
+
+# payload = {
+#             "from":"alaabdulmalik03@gmail.com",
+#             "to": email,
+#             "subject": "Registration Successful Mail",
+#             "text":"Your Registration Was Successful",
+#         }
+#         url = 'https://api.brevo.com/v1/email/send'
+#         headers = {
+#             'api-key': os.environ.get('BREVO_API_KEY'),
+#             'content-type': 'application/json',
+#             'accept': 'application/json'
+#         }
+#         response: Response = requests.post(url=url, headers=headers, data=json.dumps(payload))
+#         return response
