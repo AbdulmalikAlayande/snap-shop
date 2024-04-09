@@ -1,7 +1,7 @@
 from address.models import Address, Country, State, Locality
 from rest_framework import serializers
 
-from store.models import Customer
+from store.models import Customer, Product
 
 
 class CountrySerializer(serializers.ModelSerializer):
@@ -43,6 +43,7 @@ class LocalitySerializer(serializers.ModelSerializer):
     #         return created_address
 
 class CustomerSerializer(serializers.ModelSerializer):
+
     first_name = serializers.CharField(max_length=30)
     last_name = serializers.CharField(max_length=30)
     email = serializers.EmailField(max_length=30)
@@ -60,7 +61,17 @@ class CustomerSerializer(serializers.ModelSerializer):
         }
 
 class ProductSerializer(serializers.Serializer):
-    pass
+
+    title = serializers.CharField(max_length=255, allow_null=False)
+    description = serializers.CharField(allow_null=False)
+    unit_price = serializers.DecimalField(max_digits=6, decimal_places=2)
+    quantity = serializers.IntegerField(min_value=1)
+    category = serializers.CharField(allow_null=False)
+    last_updated = serializers.DateTimeField()
+
+    class Meta:
+        model = Product
+        fields = ['title', 'description', 'unit_price', 'quantity', 'category', 'last_updated']
 
 class OrderSerializer(serializers.Serializer):
     pass

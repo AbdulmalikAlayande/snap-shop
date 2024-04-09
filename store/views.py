@@ -10,7 +10,7 @@ from django.template.loader import get_template
 from rest_framework import status, generics
 
 from store.models import Cart
-from store.serializers import CustomerSerializer
+from store.serializers import CustomerSerializer, ProductSerializer
 
 
 class CustomerRegistrationView(generics.CreateAPIView):
@@ -59,3 +59,9 @@ class CustomerRegistrationView(generics.CreateAPIView):
             template: Template = get_template(template)
             html_content = template.render(context=context)
             return html_content
+
+class SnapShopProductsView(generics.ListAPIView):
+    serializer_class = ProductSerializer
+
+class SnapShopProductView(generics.RetrieveAPIView):
+    serializer_class = ProductSerializer

@@ -1,9 +1,12 @@
 from django.urls import path
 # from store import views_example, views
-from store.views import CustomerRegistrationView
+from store.views import CustomerRegistrationView, SnapShopProductsView, SnapShopProductView
+
 
 urlpatterns = [
-    path('customer/register/', CustomerRegistrationView.as_view())
+    path('customer/register/', CustomerRegistrationView.as_view()),
+    path('products/', SnapShopProductsView.as_view()),
+    path('products/<id:int>', SnapShopProductView.as_view()),
 ]
 
 # urlpatterns = [
