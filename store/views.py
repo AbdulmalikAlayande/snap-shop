@@ -5,7 +5,6 @@ import json
 from django.contrib.auth.password_validation import validate_password
 from django.core.mail import EmailMultiAlternatives
 from django.http import JsonResponse
-from django.template import Context
 from django.template import Template
 from django.template.loader import get_template
 from rest_framework import status, generics
@@ -15,8 +14,10 @@ from store.serializers import CustomerSerializer
 
 
 class CustomerRegistrationView(generics.CreateAPIView):
+
     EMAIL_SUBJECT = 'Registration Successful'
     serializer_class = CustomerSerializer
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.template_name = 'registration-successful-mail.html'
@@ -30,9 +31,7 @@ class CustomerRegistrationView(generics.CreateAPIView):
                 saved_customer = customer_serializer.save()
                 cart = Cart(customer=saved_customer)
                 cart.save()
-                self.send_notification_successful_mail([customer_serializer.validated_data.get('email')],
-                                                       name=saved_customer.first_name,
-                                                       subject=self.EMAIL_SUBJECT)
+                self.send_notification_successful_mail([saved_customer.email], name=saved_customer.first_name, subject=self.EMAIL_SUBJECT)
                 response = {
                     "message": "Sign Up Successful",
                     "data": customer_serializer.data
@@ -51,15 +50,12 @@ class CustomerRegistrationView(generics.CreateAPIView):
 
 
     def template_loader(self, template=None, var_dict: dict = None):
-        try:
-            context = var_dict
-            if not template or template is None:
-                template: Template = get_template(self.template_name)
-                html_content = template.render(context=context)
-                return html_content
-            else:
-                template: Template = get_template(template)
-                html_content = template.render(context=context)
-                return html_content
-        except Exception as exception:
-            print(exception)
+        context = var_dict
+        if not template or template is None:
+            template: Template = get_template(self.template_name)
+            html_content = template.render(context=context)
+            return html_content
+        else:
+            template: Template = get_template(template)
+            html_content = template.render(context=context)
+            return html_content
