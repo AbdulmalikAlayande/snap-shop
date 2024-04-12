@@ -71,7 +71,7 @@ class ProductSerializer(serializers.Serializer):
 
     class Meta:
         model = Product
-        fields = ['title', 'description', 'unit_price', 'quantity', 'category', 'last_updated']
+        fields = ['id', 'title', 'description', 'unit_price', 'quantity', 'category', 'last_updated']
 
 class OrderSerializer(serializers.Serializer):
     pass

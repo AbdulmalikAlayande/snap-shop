@@ -6,7 +6,7 @@ from store.views import CustomerRegistrationView, SnapShopProductsView, SnapShop
 urlpatterns = [
     path('customer/register/', CustomerRegistrationView.as_view()),
     path('products/', SnapShopProductsView.as_view()),
-    path('products/<id:int>', SnapShopProductView.as_view()),
+    path('product/<int:id>', SnapShopProductView.as_view()),
 ]
 
 # urlpatterns = [
