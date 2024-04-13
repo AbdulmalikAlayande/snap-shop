@@ -93,9 +93,12 @@ class AddToCartView(generics.CreateAPIView):
                 "cart": cart_items_serializer.data
             }
             return JsonResponse(response, status=status.HTTP_302_FOUND, safe=False)
-        except ValueError as exception:
-            print(exception)
-            return JsonResponse(f'Exception ==> {exception}', status=status.HTTP_400_BAD_REQUEST, safe=False)
+        except Exception as exception:
+            response = {
+                "message": "Item Could Not Be be Added To Cart",
+                "cause": exception.args
+            }
+            return JsonResponse(response, status=status.HTTP_400_BAD_REQUEST, safe=False)
 
 class CartItemListView(generics.ListAPIView):
     serializer_class = CartItemSerializer
