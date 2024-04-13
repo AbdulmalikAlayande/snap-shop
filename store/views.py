@@ -13,7 +13,7 @@ from rest_framework import status, generics
 from rest_framework.generics import get_object_or_404
 
 from store.models import Cart, Product, Customer, CartItem
-from store.serializers import CustomerSerializer, ProductSerializer, CartSerializer
+from store.serializers import CustomerSerializer, ProductSerializer, CartSerializer, CartItemSerializer
 
 
 class CustomerRegistrationView(generics.CreateAPIView):
@@ -88,12 +88,17 @@ class AddToCartView(generics.CreateAPIView):
             customer: Customer = get_object_or_404(Customer, email=data.pop('customer_email'))
             cart, is_created = Cart.objects.get_or_create(customer=customer)
             CartItem.objects.create(product=found_product, cart=cart, quantity=data.pop('quantity'))
+            cart_items_serializer = CartItemSerializer(CartItem.objects.filter(cart_id=cart.id), many=True)
             response = {
                 "message": "Item Added To Cart",
-                "cart": list(CartItem.objects.all())
+                "cart": cart_items_serializer.data
             }
             print(response)
             return JsonResponse(response, status=status.HTTP_302_FOUND, safe=False)
         except ValueError as exception:
             print(exception)
             return JsonResponse(f'Exception ==> {exception}', status=status.HTTP_400_BAD_REQUEST, safe=False)
+
+class CartItemListView(generics.ListAPIView):
+    serializer_class = CartItemSerializer
+    queryset = CartItem.objects.all()

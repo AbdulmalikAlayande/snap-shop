@@ -1,7 +1,7 @@
-from address.models import Address, Country, State, Locality
+from address.models import Country, State, Locality
 from rest_framework import serializers
 
-from store.models import Customer, Product, Cart
+from store.models import Customer, Product, Cart, CartItem
 
 
 class CountrySerializer(serializers.ModelSerializer):
@@ -84,6 +84,7 @@ class CartSerializer(serializers.ModelSerializer):
     quantity = serializers.IntegerField(min_value=0, required=True)
     customer_email = serializers.CharField(max_length=30, required=True)
     message = serializers.CharField(max_length=255)
+
     class Meta:
         model = Cart
         fields = ['id', 'created_at', 'customer', 'quantity', 'product_name', 'customer_email', 'message']
@@ -91,8 +92,25 @@ class CartSerializer(serializers.ModelSerializer):
         write_only_fields = []
 
 
-class CartItemSerializer(serializers.Serializer):
-    pass
+class CartItemSerializer(serializers.ModelSerializer):
+    cart = serializers.PrimaryKeyRelatedField(queryset=Cart.objects.all())
+    product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
+    quantity = serializers.IntegerField(min_value=0)
+    item_name = serializers.CharField(max_length=20)
+    item_description = serializers.CharField(max_length=300)
+    item_price = serializers.DecimalField(max_digits=10, decimal_places=2)
+    item_category = serializers.CharField(max_length=10)
+
+    class Meta:
+        model = CartItem
+        fields = ['id', 'product', 'cart', 'quantity']
+        read_only_fields = ['item_name', 'item_description', 'item_price', 'item_category']
+        extra_kwargs = {
+            'item_name': {'read_only': True},
+            'item_description': {'read_only': True},
+            'item_price': {'read_only': True},
+            'item_category': {'read_only': True}
+        }
 
 class RatingSerializer(serializers.Serializer):
     pass
