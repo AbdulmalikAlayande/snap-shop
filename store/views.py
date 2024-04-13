@@ -1,7 +1,6 @@
 from __future__ import print_function
 
 import json
-from datetime import datetime
 
 from django.contrib.auth.password_validation import validate_password
 # from django.core.exceptions import ValidationError

@@ -57,7 +57,6 @@ class CustomerSerializer(serializers.ModelSerializer):
         fields = ['id', 'first_name', 'last_name', 'email', 'password', 'phone_number', 'username', 'birth_date']
         extra_kwargs = {
             'password': {'write_only': True},
-            'profile_image': {'write_only': True},
         }
 
 class ProductSerializer(serializers.Serializer):
@@ -96,14 +95,14 @@ class CartItemSerializer(serializers.ModelSerializer):
     cart = serializers.PrimaryKeyRelatedField(queryset=Cart.objects.all())
     product = serializers.PrimaryKeyRelatedField(queryset=Product.objects.all())
     quantity = serializers.IntegerField(min_value=0)
-    item_name = serializers.CharField(max_length=20)
-    item_description = serializers.CharField(max_length=300)
-    item_price = serializers.DecimalField(max_digits=10, decimal_places=2)
-    item_category = serializers.CharField(max_length=10)
+    item_name = serializers.CharField(source='product.title', max_length=20)
+    item_description = serializers.CharField(source='product.description', max_length=300)
+    item_price = serializers.DecimalField(source='product.unit_price', max_digits=10, decimal_places=2)
+    item_category = serializers.CharField(source='product.category', max_length=10)
 
     class Meta:
         model = CartItem
-        fields = ['id', 'product', 'cart', 'quantity']
+        fields = ['id', 'product', 'cart', 'quantity', 'item_name', 'item_description', 'item_price', 'item_category']
         read_only_fields = ['item_name', 'item_description', 'item_price', 'item_category']
         extra_kwargs = {
             'item_name': {'read_only': True},
