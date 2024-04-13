@@ -9,10 +9,10 @@ from django.http import JsonResponse
 from django.template import Template
 from django.template.loader import get_template
 from rest_framework import status, generics
-from rest_framework.generics import get_object_or_404
 
 from store.models import Cart, Product, Customer, CartItem
 from store.serializers import CustomerSerializer, ProductSerializer, CartSerializer, CartItemSerializer
+from store.utils import get_object_or_404
 
 
 class CustomerRegistrationView(generics.CreateAPIView):
