@@ -31,9 +31,7 @@ class Product(models.Model):
     last_updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return  f"""
-                    {self.title} ({self.description})
-                """
+        return  f"""{self.title} ({self.description})"""
 
     def toJson(self):
         return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
@@ -50,15 +48,17 @@ class Customer(AbstractUser):
         return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
 
     def __str__(self):
-        return  f"""
-                    first_name: {self.first_name}
-                    last_name: {self.last_name}
-                    email: {self.email}
-                    password: {self.password}
-                    phone_number: {self.phone_number}
-                    birth_date: {self.birth_date}
-                    address: {self.address}
-                """
+        # address = list(self.address) if isinstance(self.address, set) else self.address
+        data =   {
+            'first_name': self.first_name,
+            'last_name': self.last_name,
+            'email': self.email,
+            'password': self.password,
+            'phone_number': self.phone_number,
+            'birth_date': self.birth_date.isoformat() if self.birth_date else None,
+            'address': self.address
+        }
+        return json.dumps(data, indent=4)
 
     class Meta:
         db_table = 'customers'
@@ -84,13 +84,13 @@ class Order(models.Model):
 
     def __str__(self):
         return f"""
-                placed_at: {self.placed_at},
-                order_status: {self.order_status}
-                order_number: {self.order_number}
-                customer_id: {self.customer.id}
-                total_price: {self.total_price}
-                payment: {self.payment}
-                """
+        placed_at: {self.placed_at},
+        order_status: {self.order_status}
+        order_number: {self.order_number}
+        customer_id: {self.customer.id}
+        total_price: {self.total_price}
+        payment: {self.payment}
+        """
 
 class OrderItem(models.Model):
     order = models.ForeignKey(to=Order, on_delete=PROTECT)
@@ -100,6 +100,11 @@ class OrderItem(models.Model):
 class Cart(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     customer = models.OneToOneField(to=Customer, on_delete=CASCADE)
+
+    def __str__(self):
+        return f"""customer: {self.customer}
+        created_at: {self.created_at}
+        """
 
     class Meta:
         db_table = 'carts'
