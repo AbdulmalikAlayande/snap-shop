@@ -16,6 +16,6 @@ def get_object_or_404(model, *args, **kwargs):
     try:
         return queryset.get(*args, **kwargs)
     except queryset.model.DoesNotExist:
-        raise Http404
+        raise Http404(f'model {model.__name__} does not exist')
     except queryset.model.MultipleObjectsReturned:
-        raise Http404
+        raise Http404('query did not return a unique result, multiple objects were found')

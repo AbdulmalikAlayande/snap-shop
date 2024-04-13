@@ -92,7 +92,6 @@ class AddToCartView(generics.CreateAPIView):
                 "message": "Item Added To Cart",
                 "cart": cart_items_serializer.data
             }
-            print(response)
             return JsonResponse(response, status=status.HTTP_302_FOUND, safe=False)
         except ValueError as exception:
             print(exception)
