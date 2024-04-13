@@ -1,7 +1,7 @@
 from address.models import Address, Country, State, Locality
 from rest_framework import serializers
 
-from store.models import Customer, Product
+from store.models import Customer, Product, Cart
 
 
 class CountrySerializer(serializers.ModelSerializer):
@@ -79,8 +79,16 @@ class OrderSerializer(serializers.Serializer):
 class OrderItemSerializer(serializers.Serializer):
     pass
 
-class CartSerializer(serializers.Serializer):
-    pass
+class CartSerializer(serializers.ModelSerializer):
+    created_at = serializers.DateTimeField(auto_now_add=True)
+    customer = serializers.SlugRelatedField(slug_field='email', queryset=Customer.objects.all())
+
+    class Meta:
+        model = Cart
+        field = ['id', 'created_at', 'customer']
+        read_only_fields = ['id']
+        write_only_fields = []
+
 
 class CartItemSerializer(serializers.Serializer):
     pass

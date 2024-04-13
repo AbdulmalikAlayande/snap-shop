@@ -8,12 +8,10 @@ from django.http import JsonResponse
 from django.template import Template
 from django.template.loader import get_template
 from rest_framework import status, generics
-from rest_framework.generics import get_object_or_404
-from rest_framework.response import Response
-from rest_framework.views import APIView
+from rest_framework.generics import GenericAPIView
 
 from store.models import Cart, Product
-from store.serializers import CustomerSerializer, ProductSerializer
+from store.serializers import CustomerSerializer, ProductSerializer, CartSerializer
 
 
 class CustomerRegistrationView(generics.CreateAPIView):
@@ -77,3 +75,6 @@ class SnapShopProductView(generics.RetrieveAPIView):
         except Exception as exception:
             print(exception)
 
+
+class CartView(GenericAPIView):
+    serializer_class = CartSerializer
