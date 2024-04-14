@@ -1,80 +1,64 @@
 import enum
+import json
 
+from address.models import AddressField
+from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.db.models import PROTECT, CASCADE, SET_NULL
+from django.db.models import PROTECT, CASCADE
 
+from payment.models import Payment
 
-class Collection(models.Model):
-    title = models.CharField(max_length=255)
-    featured_products = models.ForeignKey(to='Product', on_delete=SET_NULL, related_name='+', null=True)
-
-    def __repr__(self):
-        return f"""
-                    title: {self.title},
-                    featured_products: {self.featured_products},
-               """
-
-class Promotion(models.Model):
-    description = models.CharField(max_length=255)
-    discount = models.FloatField()
-
-    def __repr__(self):
-        return f"""
-                    description: {self.description},
-                    discount: {self.discount}
-                """
 
 class Product(models.Model):
+
+    class ProductCategory(enum.Enum):
+        KIDS = 'Kids'
+        ADULTS = 'Adults'
+        FOOD = 'Food'
+        KITCHEN = 'Kitchen'
+        FASHION = 'Fashion'
+        SPORTS = 'Sports'
+
+    PRODUCT_CATEGORY = [
+        (category.value, category.name) for category in ProductCategory
+    ]
+
     title = models.CharField(max_length=255, null=False)
     description = models.TextField(null=False)
     unit_price = models.DecimalField(max_digits=6, decimal_places=2)
-    inventory = models.IntegerField()
+    quantity = models.IntegerField()
+    category = models.TextField(choices=PRODUCT_CATEGORY)
     last_updated = models.DateTimeField(auto_now=True)
-    collection = models.ForeignKey(to=Collection, on_delete=PROTECT)
-    promotions = models.ManyToManyField(to=Promotion, related_name='products')
 
-    def __repr__(self):
-        return  f"""
-                    title: {self.title},
-                    description: {self.description},
-                    price: {self.unit_price},
-                    inventory: {self.inventory},
-                    last_updated: {self.last_updated}
-                    collection: {self.collection}
-                    promotions: {self.promotions}
-                """
+    def __str__(self):
+        return  f"""{self.title} ({self.description})"""
 
-    # Create your models here.
+    def toJson(self):
+        return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
 
-class Customer(models.Model):
-    class Membership_Type(enum.Enum):
-        BRONZE_MEMBERSHIP = 'B',
-        SILVER_MEMBERSHIP = 'S',
-        GOLD_MEMBERSHIP = 'G'
-    MEMBERSHIP_CHOICES = [
-        (Membership_Type.BRONZE_MEMBERSHIP, 'Bronze'),
-        (Membership_Type.SILVER_MEMBERSHIP, 'Silver'),
-        (Membership_Type.GOLD_MEMBERSHIP, 'Gold')
-    ]
-    first_name = models.CharField(max_length=255)
-    last_name = models.CharField(max_length=255)
-    email = models.EmailField(error_messages="Invalid Email", unique=True)
+    class Meta:
+        db_table = 'products'
+
+class Customer(AbstractUser):
     phone_number = models.TextField(max_length=11, null=False)
-    profile_image = models.FileField()
-    membership = models.CharField(max_length=1, choices=MEMBERSHIP_CHOICES, default=Membership_Type.BRONZE_MEMBERSHIP)
     birth_date = models.DateField(null=True)
-    profile_image_url = models.URLField()
+    address = AddressField(related_name='+', blank=True, null=True)
 
-    def __repr__(self):
-        return  f"""
-                    first_name: {self.first_name},
-                    last_name: {self.last_name},
-                    email: {self.email},
-                    phone_number: {self.phone_number},
-                    membership: {self.membership}
-                    birth_date: {self.birth_date}
-                    profile_image_url: {self.profile_image_url}
-                """
+    def toJson(self):
+        return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
+
+    def __str__(self):
+        # address = list(self.address) if isinstance(self.address, set) else self.address
+        data =   {
+            'first_name': self.first_name,
+            'last_name': self.last_name,
+            'email': self.email,
+            'password': self.password,
+            'phone_number': self.phone_number,
+            'birth_date': self.birth_date.isoformat() if self.birth_date else None,
+            'address': self.address
+        }
+        return json.dumps(data, indent=4)
 
     class Meta:
         db_table = 'customers'
@@ -83,46 +67,61 @@ class Customer(models.Model):
         ]
 
 class Order(models.Model):
-    class Payment_Status(enum.Enum):
-        PENDING = 'P',
-        COMPLETE = 'C',
-        FAILED = 'F'
+    class OrderStatus(enum.Enum):
+        DELIVERED = 'Delivered'
+        PENDING = 'Pending'
+        EN_ROUTE = 'En route'
 
-    PAYMENT_STATUS = [
-        (Payment_Status.PENDING, 'Pending'),
-        (Payment_Status.COMPLETE, 'Complete'),
-        (Payment_Status.FAILED, 'Failed')
+    ORDER_STATUS = [
+        (status.name, status.value) for status in OrderStatus
     ]
     placed_at = models.DateTimeField(auto_now_add=True, auto_created=True)
-    payment_status = models.TextField(choices=PAYMENT_STATUS, max_length=1, default=Payment_Status.PENDING)
+    order_number = models.PositiveIntegerField()
+    order_status = models.TextField(choices=ORDER_STATUS, max_length=10, default=OrderStatus.PENDING.value)
     customer = models.ForeignKey(Customer, on_delete=models.PROTECT)
+    total_price = models.DecimalField(decimal_places=2, max_digits=10)
+    payment = models.OneToOneField(to=Payment, on_delete=CASCADE)
 
-    def __repr__(self):
+    def __str__(self):
         return f"""
-                placed_at: {self.placed_at},
-                payment_status: {self.payment_status}
-                customer_id: {self.customer.id}
-                """
+        placed_at: {self.placed_at},
+        order_status: {self.order_status}
+        order_number: {self.order_number}
+        customer_id: {self.customer.id}
+        total_price: {self.total_price}
+        payment: {self.payment}
+        """
 
-class Order_Item(models.Model):
+class OrderItem(models.Model):
     order = models.ForeignKey(to=Order, on_delete=PROTECT)
     product = models.ForeignKey(to=Product, on_delete=PROTECT)
     quantity = models.PositiveIntegerField()
-    unit_price = models.DecimalField(max_digits=8, decimal_places=2)
-
-class Address(models.Model):
-    city = models.TextField(null=False)
-    street = models.TextField(null=False)
-    customer = models.OneToOneField(to=Customer, on_delete=CASCADE)
 
 class Cart(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
+    customer = models.OneToOneField(to=Customer, on_delete=CASCADE)
 
-class Item(models.Model):
-    order_item = models.ForeignKey(to=Order, on_delete=PROTECT)
-    cart = models.ForeignKey(to=Cart, on_delete=PROTECT)
+    def __str__(self):
+        return f"""customer: {self.customer}
+        created_at: {self.created_at}
+        """
 
-class Cart_Item(models.Model):
+    class Meta:
+        db_table = 'carts'
+
+class CartItem(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, null=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveSmallIntegerField()
+
+    class Meta:
+        db_table = 'cart items'
+
+class Rating(models.Model):
+    product = models.ForeignKey(to=Product, on_delete=CASCADE)
+    customer = models.ForeignKey(to=Customer, on_delete=CASCADE)
+    reviewText = models.TextField(max_length=1000)
+    datetime = models.DateTimeField()
+
+    class Meta:
+        db_table = 'ratings'
