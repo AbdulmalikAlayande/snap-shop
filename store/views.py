@@ -1,6 +1,7 @@
 from __future__ import print_function
 
 import json
+import this
 
 from django.contrib.auth.password_validation import validate_password
 # from django.core.exceptions import ValidationError
@@ -11,7 +12,9 @@ from django.template.loader import get_template
 from rest_framework import status, generics
 
 from store.models import Cart, Product, Customer, CartItem
-from store.serializers import CustomerSerializer, ProductSerializer, CartSerializer, CartItemSerializer
+from store.serializers import (CustomerSerializer, ProductSerializer,
+                               CartSerializer, CartItemSerializer,
+                               RemoveCartItemSerializer)
 from store.utils import get_object_or_404
 
 
@@ -26,23 +29,26 @@ class CustomerRegistrationView(generics.CreateAPIView):
 
     def post(self, request, *args, **kwargs):
         try:
-            data = json.loads(request.body)
-            customer_serializer = self.get_serializer(data=data)
+            customer_serializer = self.get_serializer(data=json.loads(request.body))
             if customer_serializer.is_valid():
                 validate_password(customer_serializer.validated_data.get('password'))
                 saved_customer = customer_serializer.save()
                 cart = Cart(customer=saved_customer)
                 cart.save()
                 self.send_notification_successful_mail([saved_customer.email], name=saved_customer.first_name, subject=self.EMAIL_SUBJECT)
-                response = {
+                data = {
                     "message": "Sign Up Successful",
                     "data": customer_serializer.data
                 }
-                return JsonResponse(response, status=status.HTTP_201_CREATED, safe=False)
+                return JsonResponse(data, status=status.HTTP_201_CREATED, safe=False)
             else: return JsonResponse(customer_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Exception as exception:
-            print(exception)
-            return JsonResponse(f'Registration Unsuccessful, {exception}', status=status.HTTP_400_BAD_REQUEST, safe=False)
+            data = {
+                "message": "Registration Unsuccessful",
+                "cause": exception.args,
+                "cause__str": str(exception)
+            }
+            return JsonResponse(data, status=status.HTTP_400_BAD_REQUEST, safe=False)
 
     def send_notification_successful_mail(self, to: list, name: str, subject: str):
         msg: EmailMultiAlternatives = EmailMultiAlternatives(subject=subject, to=to)
@@ -103,3 +109,10 @@ class AddToCartView(generics.CreateAPIView):
 class CartItemListView(generics.ListAPIView):
     serializer_class = CartItemSerializer
     queryset = CartItem.objects.all()
+
+class RemoveFromCartView(generics.DestroyAPIView):
+    serializer_class = RemoveCartItemSerializer
+
+    def delete(self, request, *args, **kwargs):
+        cart_item_serializer = self.get_serializer(json.loads(request.body))
+        pass

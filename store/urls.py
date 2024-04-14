@@ -7,7 +7,8 @@ urlpatterns = [
     path('customer/register/', CustomerRegistrationView.as_view()),
     path('products/', SnapShopProductsView.as_view()),
     path('product/<int:id>', SnapShopProductView.as_view()),
-    path('cart/add-item', AddToCartView.as_view())
+    path('cart/add-item', AddToCartView.as_view()),
+    path('cart/remove-item', AddToCartView.as_view()),
 ]
 
 # urlpatterns = [

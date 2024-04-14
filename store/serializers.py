@@ -82,12 +82,11 @@ class CartSerializer(serializers.ModelSerializer):
     product_name = serializers.CharField(max_length=30, required=True)
     quantity = serializers.IntegerField(min_value=0, required=True)
     customer_email = serializers.CharField(max_length=30, required=True)
-    message = serializers.CharField(max_length=255)
 
     class Meta:
         model = Cart
-        fields = ['id', 'created_at', 'customer', 'quantity', 'product_name', 'customer_email', 'message']
-        read_only_fields = ['id', 'message']
+        fields = ['id', 'created_at', 'customer', 'quantity', 'product_name', 'customer_email']
+        read_only_fields = ['id']
         write_only_fields = []
 
 
@@ -110,6 +109,11 @@ class CartItemSerializer(serializers.ModelSerializer):
             'item_price': {'read_only': True},
             'item_category': {'read_only': True}
         }
+
+class RemoveCartItemSerializer(serializers.Serializer):
+    product_name = serializers.CharField(max_length=20)
+    customer_email = serializers.CharField(max_length=20)
+
 
 class RatingSerializer(serializers.Serializer):
     pass
