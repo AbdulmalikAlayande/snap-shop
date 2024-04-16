@@ -1,6 +1,6 @@
 from django.urls import path
 # from store import views_example, views
-from store.views import CustomerRegistrationView, SnapShopProductsView, SnapShopProductView, AddToCartView
+from store.views import CustomerRegistrationView, SnapShopProductsView, SnapShopProductView, AddToCartView, RemoveFromCartView
 
 
 urlpatterns = [
@@ -8,7 +8,7 @@ urlpatterns = [
     path('products/', SnapShopProductsView.as_view()),
     path('product/<int:id>', SnapShopProductView.as_view()),
     path('cart/add-item', AddToCartView.as_view()),
-    path('cart/remove-item', AddToCartView.as_view()),
+    path('cart/remove-item', RemoveFromCartView.as_view()),
 ]
 
 # urlpatterns = [

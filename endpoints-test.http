@@ -1,0 +1,38 @@
+###
+POST http://localhost:8000/store/customer/register/
+Content-Type: application/json
+
+{
+  "first_name": "Oseni",
+  "last_name": "Ayantude",
+  "username":  "0seni@ayantude",
+  "email": "oaalayande@gmail.com",
+  "password": "seriki@62",
+  "phone_number": "08023677114",
+  "birth_date": "1962-08-09"
+}
+
+###
+POST http://localhost:8000/store/customer/register/
+Content-Type: application/json
+
+{
+"address": {
+    "longitude": 20.90,
+    "latitude": -3.456,
+    "street_number": "27B",
+    "route": "Crown Estate, Edo Inside",
+    "locality": {
+      "name": "Nigeria",
+      "postal_code": "100253",
+      "state": {
+        "name": "Lagos",
+        "code": "'LGA",
+        "country": {
+          "name": "Nigeria",
+          "code": "NG"
+        }
+      }
+    }
+  }
+  }

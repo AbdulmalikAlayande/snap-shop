@@ -44,19 +44,21 @@ class LocalitySerializer(serializers.ModelSerializer):
 
 class CustomerSerializer(serializers.ModelSerializer):
 
-    first_name = serializers.CharField(max_length=30)
-    last_name = serializers.CharField(max_length=30)
-    email = serializers.EmailField(max_length=30)
-    password = serializers.CharField(max_length=30, write_only=True)
-    username = serializers.CharField(max_length=150)
-    phone_number = serializers.CharField(max_length=11)
-    birth_date = serializers.DateField(required=False, format='%d-%m-%Y')
+    # first_name = serializers.CharField(max_length=30)
+    # last_name = serializers.CharField(max_length=30)
+    # email = serializers.EmailField(max_length=30)
+    # password = serializers.CharField(max_length=30, write_only=True)
+    # username = serializers.CharField(max_length=150)
+    # phone_number = serializers.CharField(max_length=11)
+    # birth_date = serializers.DateField(required=False, format='%d-%m-%Y')
 
     class Meta:
         model = Customer
-        fields = ['id', 'first_name', 'last_name', 'email', 'password', 'phone_number', 'username', 'birth_date']
+        # fields = ['id', 'first_name', 'last_name', 'email', 'password', 'phone_number', 'username', 'birth_date']
+        fields = "__all__"
         extra_kwargs = {
             'password': {'write_only': True},
+            'birth_date': {'format': '%d-%m-%Y'}
         }
 
 class ProductSerializer(serializers.Serializer):
@@ -111,9 +113,11 @@ class CartItemSerializer(serializers.ModelSerializer):
         }
 
 class RemoveCartItemSerializer(serializers.Serializer):
-    product_name = serializers.CharField(max_length=20)
-    customer_email = serializers.CharField(max_length=20)
+    product_name = serializers.CharField(max_length=40, required=True)
+    customer_email = serializers.CharField(max_length=40, required=True)
 
+    def validate(self, attrs):
+        return attrs
 
 class RatingSerializer(serializers.Serializer):
     pass

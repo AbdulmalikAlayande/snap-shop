@@ -1,7 +1,6 @@
 from __future__ import print_function
 
 import json
-import this
 
 from django.contrib.auth.password_validation import validate_password
 # from django.core.exceptions import ValidationError
@@ -28,8 +27,8 @@ class CustomerRegistrationView(generics.CreateAPIView):
         self.template_name = 'registration-successful-mail.html'
 
     def post(self, request, *args, **kwargs):
+        customer_serializer = self.get_serializer(data=json.loads(request.body))
         try:
-            customer_serializer = self.get_serializer(data=json.loads(request.body))
             if customer_serializer.is_valid():
                 validate_password(customer_serializer.validated_data.get('password'))
                 saved_customer = customer_serializer.save()
@@ -72,6 +71,9 @@ class SnapShopProductsView(generics.ListAPIView):
     serializer_class = ProductSerializer
     queryset = Product.objects.all()
 
+    def get(self, request, *args, **kwargs):
+        super().get(request, *args, **kwargs)
+    
 class SnapShopProductView(generics.RetrieveAPIView):
     serializer_class = ProductSerializer
 
@@ -114,5 +116,16 @@ class RemoveFromCartView(generics.DestroyAPIView):
     serializer_class = RemoveCartItemSerializer
 
     def delete(self, request, *args, **kwargs):
-        cart_item_serializer = self.get_serializer(json.loads(request.body))
-        pass
+        cart_item_serializer = self.get_serializer(data=json.loads(request.body))
+        try:
+            cart_item_serializer.is_valid(raise_exception=True)
+            customer = get_object_or_404(Customer, email=cart_item_serializer.validated_data.get("customer_email"))
+            print(customer)
+            return JsonResponse(data='No content for now', status=status.HTTP_204_NO_CONTENT, safe=False)
+        except Exception as exception:
+            errors_dict = {}
+            for argument in exception.args:
+                for error in argument:
+                    errors_list = list(map(str, argument.get(error)))
+                    errors_dict[error] = errors_list
+            return JsonResponse(data=errors_dict, status=status.HTTP_400_BAD_REQUEST, safe=False)
