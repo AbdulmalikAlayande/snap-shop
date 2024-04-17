@@ -137,13 +137,13 @@ class Order(models.Model):
         """
 
 class OrderItem(models.Model):
-    order = models.ForeignKey(to=Order, on_delete=PROTECT)
+    order = models.ForeignKey(to=Order, on_delete=PROTECT, related_name='items')
     product = models.ForeignKey(to=Product, on_delete=PROTECT)
     quantity = models.PositiveIntegerField()
 
 class Cart(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
-    customer = models.OneToOneField(to=Customer, on_delete=CASCADE)
+    customer = models.OneToOneField(to=Customer, on_delete=CASCADE, related_name='cart')
 
     def __str__(self):
         return f"""customer: {self.customer}
@@ -164,7 +164,7 @@ class CartItemManager(models.Manager):
         else: return super().create(kwargs)
 
 class CartItem(models.Model):
-    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, null=True)
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, null=True, related_name='items')
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveSmallIntegerField()
     objects = CartItemManager()
@@ -173,8 +173,8 @@ class CartItem(models.Model):
         db_table = 'cart items'
 
 class Rating(models.Model):
-    product = models.ForeignKey(to=Product, on_delete=CASCADE)
-    customer = models.ForeignKey(to=Customer, on_delete=CASCADE)
+    product = models.ForeignKey(to=Product, on_delete=CASCADE, related_name='ratings')
+    customer = models.ForeignKey(to=Customer, on_delete=CASCADE, related_name='ratings')
     reviewText = models.TextField(max_length=1000)
     datetime = models.DateTimeField()
 
