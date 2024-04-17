@@ -5,11 +5,12 @@ import json
 from django.contrib.auth.password_validation import validate_password
 from django.core.mail import EmailMultiAlternatives
 from django.db.models import Q
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.template import Template
 from django.template.loader import get_template
 from rest_framework import status, generics
 from rest_framework.exceptions import ValidationError
+from rest_framework.response import Response
 
 from store.models import Cart, Product, Customer, CartItem
 from store.serializers import (CustomerSerializer, ProductSerializer,
@@ -19,7 +20,6 @@ from store.utils import get_object_or_404
 
 
 class CustomerRegistrationView(generics.CreateAPIView):
-
     EMAIL_SUBJECT = 'Registration Successful'
     serializer_class = CustomerSerializer
 
@@ -35,13 +35,15 @@ class CustomerRegistrationView(generics.CreateAPIView):
                 saved_customer = customer_serializer.save()
                 cart = Cart(customer=saved_customer)
                 cart.save()
-                self.send_notification_successful_mail([saved_customer.email], name=saved_customer.first_name, subject=self.EMAIL_SUBJECT)
+                self.send_notification_successful_mail([saved_customer.email], name=saved_customer.first_name,
+                                                       subject=self.EMAIL_SUBJECT)
                 data = {
                     "message": "Sign Up Successful",
                     "data": customer_serializer.data
                 }
                 return JsonResponse(data, status=status.HTTP_201_CREATED, safe=False)
-            else: return JsonResponse(customer_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return JsonResponse(customer_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Exception as exception:
             data = {
                 "message": "Registration Unsuccessful",
@@ -56,7 +58,6 @@ class CustomerRegistrationView(generics.CreateAPIView):
         msg.send()
         print('Message Sent Successfully')
 
-
     def template_loader(self, template=None, var_dict: dict = None):
         context = var_dict
         if not template or template is None:
@@ -68,22 +69,34 @@ class CustomerRegistrationView(generics.CreateAPIView):
             html_content = template.render(context=context)
             return html_content
 
+
 class SnapShopProductsView(generics.ListAPIView):
     serializer_class = ProductSerializer
     queryset = Product.objects.all()
 
     def get(self, request, *args, **kwargs):
-        super().get(request, *args, **kwargs)
-    
+        return super().get(request, *args, **kwargs)
+
+
 class SnapShopProductView(generics.RetrieveAPIView):
     serializer_class = ProductSerializer
 
     def get_object(self):
         try:
+            print('Found Product ==> ', Product.objects.get(id=self.kwargs.get('id')))
             product_id = self.kwargs.get('id')
-            return Product.objects.get(id=product_id)
+            data = {
+                "message": "All Objects Found",
+                "response": Product.objects.get(id=product_id)
+            }
+            return HttpResponse(data=data, status=status.HTTP_302_FOUND)
         except Exception as exception:
             print(exception)
+            data = {
+                "message": "Could Not Retrieved Products",
+                "cause": exception.args
+            }
+            return JsonResponse(data=data, status=status.HTTP_400_BAD_REQUEST)
 
 
 class AddToCartView(generics.CreateAPIView):
@@ -109,9 +122,11 @@ class AddToCartView(generics.CreateAPIView):
             }
             return JsonResponse(response, status=status.HTTP_400_BAD_REQUEST, safe=False)
 
+
 class CartItemListView(generics.ListAPIView):
     serializer_class = CartItemSerializer
     queryset = CartItem.objects.all()
+
 
 class RemoveFromCartView(generics.DestroyAPIView):
     serializer_class = RemoveCartItemSerializer

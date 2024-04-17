@@ -1,4 +1,4 @@
-from address.models import Country, State, Locality
+from address.models import Country, State, Locality, Address
 from rest_framework import serializers
 
 from store.models import Customer, Product, Cart, CartItem
@@ -30,32 +30,25 @@ class LocalitySerializer(serializers.ModelSerializer):
         model = Locality
         fields = ['street_number', 'route', 'locality']
 
-# class AddressSerializer(serializers.ModelSerializer):
-#
-#     class Meta:
-#         model = Address
-#         fields = ['street_number', 'route', 'locality']
-#
-    # def  create(self, validated_data):
-    #     print('hello')
-    #     if validated_data:
-    #         created_address = Address.objects.create(**validated_data)
-    #         return created_address
+class AddressSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Address
+        fields = ['street_number', 'route', 'locality']
+
+    def create(self, validated_data):
+        print('hello')
+        if validated_data:
+            created_address = Address.objects.create(**validated_data)
+            return created_address
 
 class CustomerSerializer(serializers.ModelSerializer):
-
-    # first_name = serializers.CharField(max_length=30)
-    # last_name = serializers.CharField(max_length=30)
-    # email = serializers.EmailField(max_length=30)
-    # password = serializers.CharField(max_length=30, write_only=True)
-    # username = serializers.CharField(max_length=150)
-    # phone_number = serializers.CharField(max_length=11)
-    # birth_date = serializers.DateField(required=False, format='%d-%m-%Y')
 
     class Meta:
         model = Customer
         # fields = ['id', 'first_name', 'last_name', 'email', 'password', 'phone_number', 'username', 'birth_date']
         fields = "__all__"
+        read_only_fields = ['id', 'uuid']
         extra_kwargs = {
             'password': {'write_only': True},
             'birth_date': {'format': '%d-%m-%Y'}
@@ -63,16 +56,18 @@ class CustomerSerializer(serializers.ModelSerializer):
 
 class ProductSerializer(serializers.Serializer):
 
-    title = serializers.CharField(max_length=255, allow_null=False)
-    description = serializers.CharField(allow_null=False)
-    unit_price = serializers.DecimalField(max_digits=6, decimal_places=2)
-    quantity = serializers.IntegerField(min_value=1)
-    category = serializers.CharField(allow_null=False)
-    last_updated = serializers.DateTimeField()
-
     class Meta:
         model = Product
-        fields = ['id', 'title', 'description', 'unit_price', 'quantity', 'category', 'last_updated']
+        fields = "__all__"
+        read_only_fields = ['last_updated']
+        write_only_fields = ['quantity']
+        extra_kwargs = {
+            'title': {'allow_null': False, 'max_length': 255},
+            'description': {'allow_null': False},
+            'unit_price': {'allow_null': False, 'max_digits': 6, 'decimal_places': 2},
+            'quantity': {'allow_null': False, 'min_value': 1},
+            'category': {'allow_null': False},
+        }
 
 class OrderSerializer(serializers.Serializer):
     pass

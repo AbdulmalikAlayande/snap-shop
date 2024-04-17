@@ -8,6 +8,8 @@ djangorestframework = "*"
 gunicorn = "*"
 django-debug-toolbar = "*"
 setuptools = "*"
+django-address = "*"
+django-anymail = {extras = ["brevo"], version = "*"}
 
 [dev-packages]
 

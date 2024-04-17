@@ -12,10 +12,11 @@ from django.db.models import PROTECT, CASCADE
 
 from payment.models import Payment
 
+
 class AbstractModel(models.Model):
-    id = models.UUIDField(
-        verbose_name=_('Id'),
-        default=uuid.uuid4(),
+    uuid = models.UUIDField(
+        verbose_name=_('UUId'),
+        default=uuid.uuid4,
         unique=True,
         editable=False,
         db_index=True
@@ -30,11 +31,13 @@ class AbstractModel(models.Model):
         verbose_name = _('Abstract Model')
         verbose_name_plural = _('Abstract Models')
 
-class User(AbstractModel, AbstractBaseUser):
+
+class SnapShopUser(AbstractBaseUser):
     email = models.EmailField(_('Email'), max_length=100, unique=True, db_index=True, blank=False, null=False)
     full_name = models.CharField(_('Name'), max_length=40, blank=True)
     password = models.CharField(_('Password'), max_length=20, blank=False, null=False)
-    is_active = models.BooleanField(_('Active'), help_text=_('Designates Whether A User Can Access Their Account'), default=True)
+    is_active = models.BooleanField(_('Active'), help_text=_('Designates Whether A User Can Access Their Account'),
+                                    default=True)
     is_admin = models.BooleanField(_('Admin'), help_text=_('Designates Whether A User Can log into the admin site'))
     USERNAME_FIELD = 'email'
 
@@ -52,10 +55,12 @@ class User(AbstractModel, AbstractBaseUser):
         return []
 
     class Meta(AbstractModel.Meta):
+        abstract = True
         verbose_name = _('User Model')
         verbose_name_plural = _('User Models')
 
-class Product(models.Model, AbstractModel):
+
+class Product(AbstractModel):
     class ProductCategory(enum.Enum):
         KIDS = 'Kids'
         ADULTS = 'Adults'
@@ -72,10 +77,9 @@ class Product(models.Model, AbstractModel):
     unit_price = models.DecimalField(max_digits=6, decimal_places=2)
     quantity = models.IntegerField()
     category = models.TextField(choices=PRODUCT_CATEGORY)
-    last_updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return  f"""{self.title} ({self.description})"""
+        return f"""{self.title} ({self.description})"""
 
     def toJson(self):
         return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
@@ -83,7 +87,8 @@ class Product(models.Model, AbstractModel):
     class Meta:
         db_table = 'products'
 
-class Customer(AbstractUser):
+
+class Customer(AbstractUser, AbstractModel):
     phone_number = models.TextField(max_length=11, null=False)
     birth_date = models.DateField(null=True)
     address = AddressField(related_name='+', blank=True, null=True)
@@ -93,7 +98,7 @@ class Customer(AbstractUser):
 
     def __str__(self):
         # address = list(self.address) if isinstance(self.address, set) else self.address
-        data =   {
+        data = {
             'first_name': self.first_name,
             'last_name': self.last_name,
             'email': self.email,
@@ -110,19 +115,19 @@ class Customer(AbstractUser):
             models.Index(fields=['first_name', 'last_name', 'email'])
         ]
 
-class Order(models.Model):
-    class OrderStatus(enum.Enum):
-        DELIVERED = 'Delivered'
-        PENDING = 'Pending'
-        EN_ROUTE = 'En route'
 
-    ORDER_STATUS = [
-        (status.name, status.value) for status in OrderStatus
-    ]
-    placed_at = models.DateTimeField(auto_now_add=True, auto_created=True)
+class Order(AbstractModel):
+    class OrderStatus(models.TextChoices):
+        DELIVERED = 'delivered', _('Delivered')
+        PENDING = 'pending', _('Pending')
+        EN_ROUTE = 'en route', _('En route')
+
+    placed_at = models.DateTimeField(_('Placed At'), auto_now_add=True, auto_created=True)
     order_number = models.PositiveIntegerField()
-    order_status = models.TextField(choices=ORDER_STATUS, max_length=10, default=OrderStatus.PENDING.value)
-    customer = models.ForeignKey(Customer, on_delete=models.PROTECT)
+    order_status = models.TextField(_('Order Status'), choices=OrderStatus.choices, max_length=10,
+                                    default=OrderStatus.PENDING)
+    customer = models.ForeignKey(Customer, verbose_name=_('Customer'), on_delete=models.CASCADE, related_name='orders',
+                                 related_query_name='order')
     total_price = models.DecimalField(decimal_places=2, max_digits=10)
     payment = models.OneToOneField(to=Payment, on_delete=CASCADE)
 
@@ -136,12 +141,15 @@ class Order(models.Model):
         payment: {self.payment}
         """
 
-class OrderItem(models.Model):
-    order = models.ForeignKey(to=Order, on_delete=PROTECT, related_name='items')
-    product = models.ForeignKey(to=Product, on_delete=PROTECT)
+
+class OrderItem(AbstractModel):
+    order = models.ForeignKey(to=Order, verbose_name=_('Orders'), on_delete=CASCADE, related_name='items',
+                              related_query_name='item')
+    product = models.ForeignKey(to=Product, verbose_name=_('Products'), on_delete=PROTECT, related_name='+')
     quantity = models.PositiveIntegerField()
 
-class Cart(models.Model):
+
+class Cart(AbstractModel):
     created_at = models.DateTimeField(auto_now_add=True)
     customer = models.OneToOneField(to=Customer, on_delete=CASCADE, related_name='cart')
 
@@ -153,6 +161,7 @@ class Cart(models.Model):
     class Meta:
         db_table = 'carts'
 
+
 class CartItemManager(models.Manager):
 
     def create(self, **kwargs):
@@ -161,21 +170,23 @@ class CartItemManager(models.Manager):
         if item.exists():
             item.first().quantity = item.first().quantity + quantity
             return super().update(item)
-        else: return super().create(kwargs)
+        else:
+            return super().create(kwargs)
 
-class CartItem(models.Model):
-    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, null=True, related_name='items')
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+
+class CartItem(AbstractModel):
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, null=True, related_name='items', related_query_name='item')
+    product = models.ForeignKey(Product, on_delete=models.PROTECT, related_name='+')
     quantity = models.PositiveSmallIntegerField()
     objects = CartItemManager()
 
     class Meta:
         db_table = 'cart items'
 
-class Rating(models.Model):
-    product = models.ForeignKey(to=Product, on_delete=CASCADE, related_name='ratings')
-    customer = models.ForeignKey(to=Customer, on_delete=CASCADE, related_name='ratings')
-    reviewText = models.TextField(max_length=1000)
+
+class Rating(AbstractModel):
+    product = models.ForeignKey(to=Product, on_delete=CASCADE, related_name='ratings', related_query_name='rating')
+    customer = models.ForeignKey(to=Customer, on_delete=CASCADE, related_name='ratings', related_query_name='rating')
     datetime = models.DateTimeField()
 
     class Meta:
