@@ -1,5 +1,9 @@
 import enum
 import json
+import uuid
+
+from django.contrib.auth.base_user import AbstractBaseUser
+from django.utils.translation import gettext_lazy as _
 
 from address.models import AddressField
 from django.contrib.auth.models import AbstractUser
@@ -8,9 +12,50 @@ from django.db.models import PROTECT, CASCADE
 
 from payment.models import Payment
 
+class AbstractModel(models.Model):
+    id = models.UUIDField(
+        verbose_name=_('Id'),
+        default=uuid.uuid4(),
+        unique=True,
+        editable=False,
+        db_index=True
+    )
 
-class Product(models.Model):
+    created_at = models.DateTimeField(_('Created At'), auto_now_add=True)
+    last_updated = models.DateTimeField(_('Last Updated'), auto_now=True)
 
+    class Meta:
+        abstract = True
+        ordering = []
+        verbose_name = _('Abstract Model')
+        verbose_name_plural = _('Abstract Models')
+
+class User(AbstractModel, AbstractBaseUser):
+    email = models.EmailField(_('Email'), max_length=100, unique=True, db_index=True, blank=False, null=False)
+    full_name = models.CharField(_('Name'), max_length=40, blank=True)
+    password = models.CharField(_('Password'), max_length=20, blank=False, null=False)
+    is_active = models.BooleanField(_('Active'), help_text=_('Designates Whether A User Can Access Their Account'), default=True)
+    is_admin = models.BooleanField(_('Admin'), help_text=_('Designates Whether A User Can log into the admin site'))
+    USERNAME_FIELD = 'email'
+
+    @property
+    def is_staff(self):
+        return self.is_admin
+
+    def has_perm(self, perm, obj=None):
+        return self.is_active and self.is_admin
+
+    def has_module_permission(self):
+        return self.is_active and self.is_admin
+
+    def get_all_permissions(self, obj=None):
+        return []
+
+    class Meta(AbstractModel.Meta):
+        verbose_name = _('User Model')
+        verbose_name_plural = _('User Models')
+
+class Product(models.Model, AbstractModel):
     class ProductCategory(enum.Enum):
         KIDS = 'Kids'
         ADULTS = 'Adults'
@@ -22,7 +67,6 @@ class Product(models.Model):
     PRODUCT_CATEGORY = [
         (category.value, category.name) for category in ProductCategory
     ]
-
     title = models.CharField(max_length=255, null=False)
     description = models.TextField(null=False)
     unit_price = models.DecimalField(max_digits=6, decimal_places=2)
@@ -109,10 +153,21 @@ class Cart(models.Model):
     class Meta:
         db_table = 'carts'
 
+class CartItemManager(models.Manager):
+
+    def create(self, **kwargs):
+        quantity = kwargs.get('quantity')
+        item = self.filter(kwargs.get('cart'), kwargs.get('product'))
+        if item.exists():
+            item.first().quantity = item.first().quantity + quantity
+            return super().update(item)
+        else: return super().create(kwargs)
+
 class CartItem(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, null=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveSmallIntegerField()
+    objects = CartItemManager()
 
     class Meta:
         db_table = 'cart items'

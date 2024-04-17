@@ -3,12 +3,13 @@ from __future__ import print_function
 import json
 
 from django.contrib.auth.password_validation import validate_password
-# from django.core.exceptions import ValidationError
 from django.core.mail import EmailMultiAlternatives
+from django.db.models import Q
 from django.http import JsonResponse
 from django.template import Template
 from django.template.loader import get_template
 from rest_framework import status, generics
+from rest_framework.exceptions import ValidationError
 
 from store.models import Cart, Product, Customer, CartItem
 from store.serializers import (CustomerSerializer, ProductSerializer,
@@ -120,12 +121,25 @@ class RemoveFromCartView(generics.DestroyAPIView):
         try:
             cart_item_serializer.is_valid(raise_exception=True)
             customer = get_object_or_404(Customer, email=cart_item_serializer.validated_data.get("customer_email"))
-            print(customer)
-            return JsonResponse(data='No content for now', status=status.HTTP_204_NO_CONTENT, safe=False)
-        except Exception as exception:
+            customers_cart = get_object_or_404(Cart, customer=customer)
+            product_name = cart_item_serializer.validated_data.get("product_name")
+            CartItem.objects.filter(Q(cart=customers_cart) & Q(product__title=product_name)).delete()
+            data = {
+                "message": "%s Was Deleted From Your Cart" % product_name,
+                "cart": list(CartItem.objects.filter(cart=customers_cart))
+            }
+            print(data)
+            return JsonResponse(data=data, status=status.HTTP_204_NO_CONTENT)
+        except ValidationError as exception:
             errors_dict = {}
             for argument in exception.args:
                 for error in argument:
                     errors_list = list(map(str, argument.get(error)))
                     errors_dict[error] = errors_list
-            return JsonResponse(data=errors_dict, status=status.HTTP_400_BAD_REQUEST, safe=False)
+            return JsonResponse(data=errors_dict, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as exception:
+            errors = {
+                'message': 'Error Removing Item from Cart',
+                "cause": exception.args
+            }
+            return JsonResponse(data=errors, status=status.HTTP_400_BAD_REQUEST)
