@@ -87,4 +87,8 @@ venv.bak/
 
 # PyCharm
 .idea/
+.idea
+
+### Vs Code ###
+.vscode
 
