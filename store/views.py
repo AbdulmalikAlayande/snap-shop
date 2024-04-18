@@ -10,7 +10,7 @@ from django.template import Template
 from django.template.loader import get_template
 from rest_framework import status, generics
 from rest_framework.exceptions import ValidationError
-from rest_framework.response import Response
+# from rest_framework.response import Response
 
 from store.models import Cart, Product, Customer, CartItem
 from store.serializers import (CustomerSerializer, ProductSerializer,
@@ -28,7 +28,7 @@ class CustomerRegistrationView(generics.CreateAPIView):
         self.template_name = 'registration-successful-mail.html'
 
     def post(self, request, *args, **kwargs):
-        customer_serializer = self.get_serializer(data=json.loads(request.body))
+        customer_serializer = self.get_serializer(data=request.data)
         try:
             if customer_serializer.is_valid():
                 validate_password(customer_serializer.validated_data.get('password'))
@@ -43,6 +43,7 @@ class CustomerRegistrationView(generics.CreateAPIView):
                 }
                 return JsonResponse(data, status=status.HTTP_201_CREATED, safe=False)
             else:
+                print('serializer errors', customer_serializer.errors)
                 return JsonResponse(customer_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Exception as exception:
             data = {

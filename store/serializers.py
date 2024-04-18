@@ -1,52 +1,12 @@
-from address.models import Country, State, Locality, Address
 from rest_framework import serializers
 
 from store.models import Customer, Product, Cart, CartItem
 
 
-class CountrySerializer(serializers.ModelSerializer):
-    name = serializers.CharField(max_length=15)
-    code = serializers.CharField(max_length=3)
-
-    class Meta:
-        model = Country
-        fields = ['street_number', 'route', 'locality']
-
-class StateSerializer(serializers.ModelSerializer):
-    name = serializers.CharField(max_length=15)
-    code = serializers.CharField(max_length=3)
-    country = serializers.RelatedField(queryset=Country.objects.all())
-
-    class Meta:
-        model = State
-        fields = ['street_number', 'route', 'locality']
-
-class LocalitySerializer(serializers.ModelSerializer):
-    name = serializers.CharField(max_length=15)
-    postal_code = serializers.CharField(max_length=10)
-    state = serializers.RelatedField(queryset=State.objects.all())
-
-    class Meta:
-        model = Locality
-        fields = ['street_number', 'route', 'locality']
-
-class AddressSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Address
-        fields = ['street_number', 'route', 'locality']
-
-    def create(self, validated_data):
-        print('hello')
-        if validated_data:
-            created_address = Address.objects.create(**validated_data)
-            return created_address
-
 class CustomerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Customer
-        # fields = ['id', 'first_name', 'last_name', 'email', 'password', 'phone_number', 'username', 'birth_date']
         fields = "__all__"
         read_only_fields = ['id', 'uuid']
         extra_kwargs = {
@@ -54,8 +14,8 @@ class CustomerSerializer(serializers.ModelSerializer):
             'birth_date': {'format': '%d-%m-%Y'}
         }
 
-class ProductSerializer(serializers.Serializer):
 
+class ProductSerializer(serializers.Serializer):
     class Meta:
         model = Product
         fields = "__all__"
@@ -69,11 +29,14 @@ class ProductSerializer(serializers.Serializer):
             'category': {'allow_null': False},
         }
 
+
 class OrderSerializer(serializers.Serializer):
     pass
 
+
 class OrderItemSerializer(serializers.Serializer):
     pass
+
 
 class CartSerializer(serializers.ModelSerializer):
     product_name = serializers.CharField(max_length=30, required=True)
@@ -107,12 +70,14 @@ class CartItemSerializer(serializers.ModelSerializer):
             'item_category': {'read_only': True}
         }
 
+
 class RemoveCartItemSerializer(serializers.Serializer):
     product_name = serializers.CharField(max_length=40, required=True)
     customer_email = serializers.CharField(max_length=40, required=True)
 
     def validate(self, attrs):
         return attrs
+
 
 class RatingSerializer(serializers.Serializer):
     pass

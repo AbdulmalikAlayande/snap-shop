@@ -5,7 +5,6 @@ import uuid
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.utils.translation import gettext_lazy as _
 
-from address.models import AddressField
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models import PROTECT, CASCADE
@@ -89,9 +88,8 @@ class Product(AbstractModel):
 
 
 class Customer(AbstractUser, AbstractModel):
-    phone_number = models.TextField(max_length=11, null=False)
+    phone_number = models.CharField(max_length=11, null=False)
     birth_date = models.DateField(null=True)
-    address = AddressField(related_name='+', blank=True, null=True)
 
     def toJson(self):
         return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
@@ -105,7 +103,6 @@ class Customer(AbstractUser, AbstractModel):
             'password': self.password,
             'phone_number': self.phone_number,
             'birth_date': self.birth_date.isoformat() if self.birth_date else None,
-            'address': self.address
         }
         return json.dumps(data, indent=4)
 
